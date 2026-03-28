@@ -1,0 +1,42 @@
+diff --git a/src/main.py b/src/main.py
+index ddbe590..14f25c1 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
+ 
+ from src.database import close_database, open_database
+ from src.dependencies.logs import get_logger
+-from src.routers import users
+ from src.routers.exceptions import add_exception_handlers
+ from src.schemas.health_check import HealthCheck
+ from src.utils.logs import LogClient, LoggingMiddleware, set_basic_config
+@@ -42,7 +41,6 @@ app.add_middleware(
+ app.add_middleware(LoggingMiddleware)
+ 
+ # エンドポイントごとにファイルを分割する場合、エンドポイントごとのルーターを追加していきます。
+-app.include_router(users.router, prefix="/users")
+ 
+ 
+ # 小規模なプロジェクトでは、main.py に全てのエンドポイントを書いてしまうこともあります。
+diff --git a/src/models/__init__.py b/src/models/__init__.py
+index d78ee5f..9cb58b7 100644
+--- a/src/models/__init__.py
++++ b/src/models/__init__.py
+@@ -1,2 +1 @@
+ # Alembic needs to import models from here
+-from src.models.users import User  # noqa
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 41bd68a..56d9bf9 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -8,10 +8,8 @@ from sqlalchemy import NullPool, create_engine
+ from sqlalchemy.orm import Session, close_all_sessions, scoped_session, sessionmaker
+ 
+ from src.models.base import Base
+-from tests.factories.models.users import UserFactory
+ 
+ # Factory の登録
+-register(UserFactory)
+ 
+ 
+ # fixture の登録
