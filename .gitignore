@@ -46,3 +46,14 @@ Thumbs.db
 # Database
 *.sqlite3
 *.db
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+infra/terraform.tfvars
+infra/.terraform.lock.hcl
+infra/crash.log
+infra/override.tf
+infra/override.tf.json

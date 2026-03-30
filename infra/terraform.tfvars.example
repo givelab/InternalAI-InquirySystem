@@ -1,0 +1,29 @@
+# このファイルを terraform.tfvars にコピーして実際の値を設定してください
+# cp terraform.tfvars.example terraform.tfvars
+#
+# 注意: terraform.tfvars は .gitignore で除外されています（シークレットを含むため）
+
+# -----------------------------------------------
+# 必須: シークレット（必ず設定してください）
+# -----------------------------------------------
+db_password    = "YOUR_STRONG_PASSWORD_HERE"
+openai_api_key = "sk-proj-xxxxxxxxxxxxxxxxxxxx"
+
+# Gemini を使う場合はこちらも設定
+# gemini_api_key = "AIzaSy-xxxxxxxxxxxxxxxxxxxx"
+
+# -----------------------------------------------
+# 任意: デフォルトから変更する場合のみ設定
+# -----------------------------------------------
+# aws_region   = "ap-northeast-1"
+# project_name = "internal-ai"
+# environment  = "production"
+
+# db_instance_class = "db.t3.micro"
+# db_name           = "chat_app"
+# db_username       = "postgres"
+
+# backend_cpu    = 256
+# backend_memory = 512
+# frontend_cpu   = 256
+# frontend_memory = 512
