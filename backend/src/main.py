@@ -9,8 +9,9 @@ from typing import AsyncGenerator
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.database import close_database, open_database
+from src.database import close_database, open_database, get_db_engine
 from src.dependencies.logs import get_logger
+from src.models import Base
 from src.routers import users
 from src.routers.exceptions import add_exception_handlers
 from src.schemas.health_check import HealthCheck
@@ -21,6 +22,8 @@ from src.utils.logs import LogClient, LoggingMiddleware, set_basic_config
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     set_basic_config()
     open_database()
+    engine = await get_db_engine()
+    Base.metadata.create_all(bind=engine)
     yield
     close_database()
 

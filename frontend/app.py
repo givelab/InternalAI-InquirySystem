@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from dotenv import load_dotenv
 import os
+import uuid
 import pandas as pd
 
 # .env ファイルの読み込み
@@ -9,13 +10,14 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
-st.title("バックエンドデータのドキュメントビューア")
+st.title("社内AIアシスタント")
 
 st.sidebar.header("メニュー")
 menu = [
-    "ユーザー一覧", 
-    "ユーザー追加", 
-    "タスク一覧", 
+    "AIチャット",
+    "ユーザー一覧",
+    "ユーザー追加",
+    "タスク一覧",
     "タスク追加・更新",
     "タスク削除",
 ]
@@ -87,9 +89,58 @@ def delete_task(task_id: int):
         return False
 
 # ----------------------------------------
+# チャット関連のAPI呼び出し
+# ----------------------------------------
+def post_chat(session_id: str, message: str):
+    try:
+        response = requests.post(
+            f"{API_BASE_URL}/chat",
+            json={"session_id": session_id, "message": message},
+        )
+        response.raise_for_status()
+        return response.json().get("answer", "")
+    except requests.exceptions.RequestException as e:
+        st.error(f"チャットエラー: {e}")
+        return None
+
+# ----------------------------------------
 # 画面構成
 # ----------------------------------------
-if choice == "ユーザー一覧":
+if choice == "AIチャット":
+    st.subheader("社内ドキュメント連携チャット")
+
+    # セッションIDをセッション状態で管理（会話ごとに固定）
+    if "chat_session_id" not in st.session_state:
+        st.session_state.chat_session_id = str(uuid.uuid4())
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = []
+
+    # 会話履歴を表示
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+
+    # チャット入力
+    if prompt := st.chat_input("メッセージを入力してください"):
+        # ユーザーメッセージを表示・保存
+        st.session_state.chat_messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
+
+        # バックエンドに送信してAI応答を取得
+        with st.chat_message("assistant"):
+            with st.spinner("回答を生成中..."):
+                answer = post_chat(st.session_state.chat_session_id, prompt)
+            if answer:
+                st.write(answer)
+                st.session_state.chat_messages.append({"role": "assistant", "content": answer})
+
+    if st.button("会話をリセット"):
+        st.session_state.chat_session_id = str(uuid.uuid4())
+        st.session_state.chat_messages = []
+        st.rerun()
+
+elif choice == "ユーザー一覧":
     st.subheader("ユーザー一覧")
     users = get_users()
     if users:

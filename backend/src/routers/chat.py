@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.dependencies.database import get_db
@@ -23,4 +23,11 @@ def post_chat(
     logger: LogClient = Depends(get_logger),
     db: Session = Depends(get_db),
 ) -> ChatResponse:
-    return chat_service.process_chat(logger, db, request)
+    try:
+        return chat_service.process_chat(logger, db, request)
+    except FileNotFoundError as e:
+        logger.error(f"Excel file not found: {e}")
+        raise HTTPException(status_code=500, detail=f"Excel file not found: {e}")
+    except Exception as e:
+        logger.error(f"Chat processing error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

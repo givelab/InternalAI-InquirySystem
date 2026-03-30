@@ -26,6 +26,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/src:/app/src
+      - ./backend/data:/app/data
     environment:
       DB_USER: postgres
       DB_PASSWORD: postgres
